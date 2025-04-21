@@ -27,7 +27,7 @@ import sys
     better do not adjust them 
     we will update them on our github if there will be a need for it
 """
-CHAIN_ID = 57054
+CHAIN_ID = 146
 POW_CONTRACT = "0x8888FF459Da48e5c9883f893fc8653c8E55F8888"
 INFINITY_ADDRESS = "0x888852d1c63c7b333efEb1c4C5C79E36ce918888"
 POW_NEW_PROBLEM_TOPIC0 = "0xa100d84256eafde4f67167e266005a7b734f135b1ba16dd349e2469a81d05c47"

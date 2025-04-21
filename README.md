@@ -97,7 +97,7 @@ The container already includes everything needed.
    pip3 install pybind11 safe-pysha3 ecdsa web3 coincurve websocket-client websockets dotenv 
 
    # Clone and build:
-   git clone https://github.com/otonashi-labs/pow.git
+   git clone git@github.com:8finity-xyz/miner-gpu.git
    cd pow
    make clean && make
 
@@ -169,7 +169,7 @@ To build:
     # Install Python packages for Python (uncomment on need)
     # pip3 install pybind11 safe-pysha3 ecdsa web3 coincurve websocket-client websockets dotenv 
 
-    git clone https://github.com/otonashi-labs/pow.git
+    git clone https://github.com/8finity-xyz/miner-gpu
     cd pow
     chmod +x build_mac.sh
     ./build_mac.sh
@@ -215,8 +215,8 @@ REWARDS_RECIPIENT_ADDRESS = <PASTE_YOUR_ADDREDD_HERE>
 
 # RPCs
 # if you dont know what is it - just leave it this way
-INFINITY_RPC = https://rpc.blaze.soniclabs.com
-INFINITY_WS = wss://rpc.blaze.soniclabs.com
+INFINITY_RPC = https://rpc.soniclabs.com
+INFINITY_WS = wss://rpc.soniclabs.com
 
 ```
 Alright, in order to mine you need to have **mining wallet** with sonic balance there in order to cover gas expenses. 
