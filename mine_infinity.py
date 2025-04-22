@@ -337,7 +337,7 @@ def build_submit_tx_fast(
     )
     
     calldata_array = [
-        _ensure_padding(master_address),
+        _ensure_padding(reward_recipient_address),
         _ensure_padding(hex(pub_key_x)),
         _ensure_padding(hex(pub_key_y)),
         "00000000000000000000000000000000000000000000000000000000000000a0", # offset to signatureAB, always the same
