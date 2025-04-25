@@ -613,6 +613,8 @@ def poll_state_periodically(poll_interval=0.5):
 
 
 def _diff_to_iter(hex_string):
+    if hex_string == "NaN":
+        return "NaN"
     hex_string = hex_string[2:]
     leading_zeros = 0
     for c in hex_string:
@@ -654,6 +656,15 @@ MINING_STATS = {
     "last_tx_hash" : "NaN"
 }
 
+def _safe_cast(d, field):
+    if field not in d:
+        if field in ["sonic_balance", "balance"]:
+            return 0.0
+        else:
+            return "NaN"
+    else:
+        return d[field]
+
 def versobse_stats(
         last_poll_data,
         last_problem,
@@ -668,14 +679,20 @@ def versobse_stats(
         MINING_STATS["last_sonic_balance"] = last_poll_data["sonic_balance"]
 
     if (time.time() - 60 > MINING_STATS["last_inf_balance_time"]):
-        delta = last_poll_data["balance"] - MINING_STATS["last_inf_balance"]
-        MINING_STATS["last_inf_balance"] = last_poll_data["balance"]
-        MINING_STATS["last_inf_speed"] = f"{delta:.1f}"
-        MINING_STATS["last_inf_balance_time"] = time.time()
+        if ("balance" in last_poll_data):
+            delta = last_poll_data["balance"] - MINING_STATS["last_inf_balance"]
+            MINING_STATS["last_inf_balance"] = last_poll_data["balance"]
+            MINING_STATS["last_inf_speed"] = f"{delta:.1f}"
+            MINING_STATS["last_inf_balance_time"] = time.time()
+        else: 
+            MINING_STATS["last_inf_speed"]  = "NaN"
 
-        delta_sonic = last_poll_data["sonic_balance"] - MINING_STATS["last_sonic_balance"] 
-        MINING_STATS["last_sonic_balance"] = last_poll_data["sonic_balance"]
-        MINING_STATS["last_sonic_speed"] = f"{delta_sonic:.2f}"
+        if ("sonic_balance" in last_poll_data):
+            delta_sonic = last_poll_data["sonic_balance"] - MINING_STATS["last_sonic_balance"] 
+            MINING_STATS["last_sonic_balance"] = last_poll_data["sonic_balance"]
+            MINING_STATS["last_sonic_speed"] = f"{delta_sonic:.2f}"
+        else:
+            MINING_STATS["last_sonic_speed"] = "NaN"
 
     if last_miner_state and last_miner_state["tx_status"] == "OK" and last_miner_state["payload"] != MINING_STATS["last_tx_hash"]:
         if "0x" in last_miner_state["payload"]:
@@ -700,19 +717,19 @@ def versobse_stats(
     lines = []
 
     lines.append(f"           [STATS at {time.time():.3f}]")
-    lines.append(f"[PKEYA]             {last_problem['privateKeyA']}")
-    lines.append(f"[DIFFICULTY]        {last_problem['difficulty']}")
-    lines.append(f"[DIFF-ITER]         {_diff_to_iter(last_problem['difficulty'])} steps on average to find solution")
-    lines.append(f"[PROBLEM EPOCH]     {last_problem['problemNonce']}")
+    lines.append(f"[PKEYA]             {_safe_cast(last_problem, 'privateKeyA')}")
+    lines.append(f"[DIFFICULTY]        {_safe_cast(last_problem, 'difficulty')}")
+    lines.append(f"[DIFF-ITER]         {_diff_to_iter(_safe_cast(last_problem, 'difficulty'))} steps on average to find solution")
+    lines.append(f"[PROBLEM EPOCH]     {_safe_cast(last_problem, 'problemNonce')}")
     lines.append(f"")
     lines.append(f"            [MINER STATS]")
     lines.append(f"[TX SENT]            {MINING_STATS['tx_ok']}")
     lines.append(f"[EPOCHS ELAPSED]     {MINING_STATS['epochs_elapsed']}")
     lines.append(f"[CURRENT EPOCH SUB]  {MINING_STATS['curr_sub_per_epoch']}")
     lines.append(f"[AVG SUB PER EPOCH]  {avg_share_per_epoc}")
-    lines.append(f"[INF BALANCE]        {last_poll_data['balance']:.0f} tokens")
+    lines.append(f"[INF BALANCE]        {_safe_cast(last_poll_data, 'balance'):.0f} tokens")
     lines.append(f"[MINING SPEED]       {MINING_STATS['last_inf_speed']} tokens per min")
-    lines.append(f"[S BALANCE]          {last_poll_data['sonic_balance']:.2f} S")
+    lines.append(f"[S BALANCE]          {_safe_cast(last_poll_data, 'sonic_balance'):.2f} S")
     lines.append(f"[S SPEND SPEED]      {MINING_STATS['last_sonic_speed']} Sonic per min")
     lines.append(f"")
     lines.append(f"[MINER ADDRESS]       {MASTER_ADDRESS}")
@@ -855,7 +872,10 @@ def main_loop():
         if (refresh_cli_counter == REFRESH_CLI_RATE):
             refresh_cli_counter = 0
             if last_poll_data and last_problem and last_miner_state:
-                versobse_stats(last_poll_data,last_problem,last_miner_state)
+                try:
+                    versobse_stats(last_poll_data,last_problem,last_miner_state)
+                except:
+                    pass
             
 
         sleep_to_next_multiple(DEFAULT_MAIN_LOOP_STEP_SECONDS)

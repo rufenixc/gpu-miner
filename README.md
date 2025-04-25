@@ -97,7 +97,7 @@ The container already includes everything needed.
    pip3 install pybind11 safe-pysha3 ecdsa web3 coincurve websocket-client websockets dotenv 
 
    # Clone and build:
-   git clone git@github.com:8finity-xyz/miner-gpu.git
+   git clone https://github.com/8finity-xyz/miner-gpu.git
    cd pow
    make clean && make
 
@@ -169,7 +169,7 @@ To build:
     # Install Python packages for Python (uncomment on need)
     # pip3 install pybind11 safe-pysha3 ecdsa web3 coincurve websocket-client websockets dotenv 
 
-    git clone https://github.com/8finity-xyz/miner-gpu
+    git clone https://github.com/8finity-xyz/miner-gpu.git
     cd pow
     chmod +x build_mac.sh
     ./build_mac.sh
@@ -196,6 +196,170 @@ To build:
 
 If you don’t have a local GPU, you can deploy your build (or the prebuilt Docker image) onto Vast.ai. While renting a machine with GPU support, upload/pull the container and run the same steps (create your own template there to do that).
 
+<details>
+    <summary>Vast.ai Tutorial</summary>
+
+## Step 1. Setup Vast.ai
+Create account at vast.ai and add some funds there.
+
+Click "Templates" on the left menu bar. Press "New" on the right top side of the screen.
+
+**Template Name** -- write any name
+
+**Image Path:Tag** -- paste `otonashilabs/infinity-miner:latest`
+
+Press create and use. Return to "Create" menu tab.
+
+⸻
+
+## Step 2. Create instance and connect to it.
+
+Choose the GPU build you want to, and click "Rent"
+
+Navigate to "Instances" menu folder. You will see your VM with GPU being created. Wait for the key button on it to become blue.
+
+Create ssh key on your computer. Locate public key. Return to vast.ai "Instances", click blue button with key there and paste your **Public Key** There. Press "+ ADD SSH KEY"
+
+After that you will see something like: `ssh -p 17571 root@1.1.1.1 -L 8080:localhost:8080` .
+
+Copy only the `-p 17571 root@1.1.1.1` part.
+
+Type in your terminal `ssh -i ~/.ssh/your_private_key -p 17571 root@1.1.1.1` 
+
+So, basically only use the port (`-p 17571`) and address (`root@1.1.1.1`) from vast.ai
+
+You will be probably asked by your terminal if you want to connect to this host. Type `yes`
+
+⸻
+
+## Step 3. Check Miner and launch it.
+
+Hooray. You have connected!
+
+type
+```bash
+cd /app
+```
+once you connect
+
+then 
+```bash
+nano .env
+```
+and past valuables there. For example please refer to .env.example.
+
+**NOTE:**
+
+Please write both private key and addresses starting with "0x" prefix
+
+After you have done that
+
+
+test that you are good to go
+```bash
+python3 test_opencl_kernel.py  
+```
+
+run the miner:
+```bash
+python3 mine_infinity.py
+```
+⸻
+
+</details>
+
+
+<details>
+    <summary>SSH keys guide</summary>
+
+## 🧰 STEP 1: Generate SSH Key Pair
+
+**NOTE:** 
+
+This is a general guide. 
+
+You can also refer to [this](https://www.digitalocean.com/community/tutorial-collections/how-to-set-up-ssh-keys) guide
+
+### ✅ macOS & Linux
+
+1. **Open Terminal**
+2. Run this: `ssh-keygen -t rsa -b 4096 -C "your_email@example.com"`
+3.	Press Enter to accept the default file location.
+4.	Set a passphrase (or press Enter to skip).
+
+Your key files will be:
+•	~/.ssh/id_rsa (private key)
+•	~/.ssh/id_rsa.pub (public key)
+
+⸻
+
+### ✅ Windows (PowerShell or Git Bash)
+1.	Open Git Bash or PowerShell
+2.	Run: `ssh-keygen -t rsa -b 4096 -C "your_email@example.com"`
+3.	Press Enter to accept the default path.
+4.	Optionally enter a passphrase.
+
+Your key files will be in:
+•	C:\Users\YourName\.ssh\id_rsa
+•	C:\Users\YourName\.ssh\id_rsa.pub
+
+⸻
+
+## 📍 STEP 2: Locate Your Public Key
+
+### macOS & Linux
+
+`cat ~/.ssh/id_rsa.pub`
+
+### Windows (PowerShell)
+
+`type $env:USERPROFILE\.ssh\id_rsa.pub`
+
+Or open the file manually:
+
+`C:\Users\YourName\.ssh\id_rsa.pub`
+
+Copy the entire output — it will look like:
+
+`ssh-rsa AAAAB3Nza... your_email@example.com`
+
+
+
+⸻
+
+## 📡 STEP 3: Add Your Public Key to the Remote Server
+1.	Connect using a password: `ssh username@remote_host_ip`
+2.	On the remote server:
+```bash
+mkdir -p ~/.ssh
+nano ~/.ssh/authorized_keys
+```
+
+3.	Paste your public key into that file.
+4.	Save and exit (CTRL+X, then Y).
+5.	Set the right permissions:
+
+```bash
+chmod 600 ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+```
+
+
+⸻
+
+## 🔐 STEP 4: Log In with Your SSH Key
+
+Now you can log in without a password:
+
+`ssh username@remote_host_ip`
+
+If your key has a custom name:
+
+`ssh -i ~/.ssh/your_key_name username@remote_host_ip`
+
+
+</details>
+
 ---
 
 ## 2. Usage
@@ -215,8 +379,8 @@ REWARDS_RECIPIENT_ADDRESS = <PASTE_YOUR_ADDREDD_HERE>
 
 # RPCs
 # if you dont know what is it - just leave it this way
-INFINITY_RPC = https://rpc.soniclabs.com
-INFINITY_WS = wss://rpc.soniclabs.com
+INFINITY_RPC = https://rpc.blaze.soniclabs.com
+INFINITY_WS = wss://rpc.blaze.soniclabs.com
 
 ```
 Alright, in order to mine you need to have **mining wallet** with sonic balance there in order to cover gas expenses. 
